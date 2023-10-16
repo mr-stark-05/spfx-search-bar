@@ -1,12 +1,20 @@
-import { Log } from '@microsoft/sp-core-library';
+import { override } from "@microsoft/decorators";
+//import { Log } from "@microsoft/sp-core-library";
 import {
-  BaseApplicationCustomizer
-} from '@microsoft/sp-application-base';
-import { Dialog } from '@microsoft/sp-dialog';
+  BaseApplicationCustomizer,
+  PlaceholderContent,
+  PlaceholderName
+} from "@microsoft/sp-application-base";
+//import { Dialog } from "@microsoft/sp-dialog";
+import * as React from 'react';
+import * as ReactDom from 'react-dom';
+import SearchResults from './components/SearchResults';
+import { graphfi, SPFx } from '@pnp/graph';
+import { getHttpClient } from './httpClientConfig';
+//import * as strings from "SearchBarApplicationCustomizerStrings";
+import { Version } from '@microsoft/sp-core-library';
 
-import * as strings from 'SearchBarApplicationCustomizerStrings';
-
-const LOG_SOURCE: string = 'SearchBarApplicationCustomizer';
+//const LOG_SOURCE: string = "SearchBarApplicationCustomizer";
 
 /**
  * If your command set uses the ClientSideComponentProperties JSON input,
@@ -19,21 +27,57 @@ export interface ISearchBarApplicationCustomizerProperties {
 }
 
 /** A Custom Action which can be run during execution of a Client Side Application */
-export default class SearchBarApplicationCustomizer
-  extends BaseApplicationCustomizer<ISearchBarApplicationCustomizerProperties> {
+export default class SearchBarApplicationCustomizer extends BaseApplicationCustomizer<ISearchBarApplicationCustomizerProperties> {
+  private topPlaceHolder: PlaceholderContent | undefined;
 
+  @override
   public onInit(): Promise<void> {
-    Log.info(LOG_SOURCE, `Initialized ${strings.Title}`);
+    return super.onInit().then((_) => {
+      graphfi().using(SPFx(this.context));
+      getHttpClient(this.context.httpClient);
+      this.context.placeholderProvider.changedEvent.add(
+        this,
+        this.renderPlaceholders
+      );
+      return Promise.resolve();
+    });
+  }
 
-    let message: string = this.properties.testMessage;
-    if (!message) {
-      message = '(No properties were provided.)';
+  protected onDispose(): void {
+    // Added exclamation point to get rid of error. Could cause issues in the future so check here if not working
+    ReactDom.unmountComponentAtNode(this.topPlaceHolder!.domElement);
+  }
+
+  protected get dataVersion(): Version {
+    return Version.parse("1.0");
+  }
+
+  //Render the Search Box in the top placeholder
+  private renderPlaceholders() {
+    if (!this.topPlaceHolder) {
+      this.topPlaceHolder = this.context.placeholderProvider.tryCreateContent(
+        PlaceholderName.Top,
+        { onDispose: this.onDispose }
+      );
     }
-
-    Dialog.alert(`Hello from ${strings.Title}:\n\n${message}`).catch(() => {
-      /* handle error */
+    //Create functional component and render in top place holder
+    const element: React.ReactElement<{}> = React.createElement(SearchResults, {
+      onDispose: this.onDispose,
     });
 
-    return Promise.resolve();
+    // Added exclamation points to avoid error. Check here if having problems
+    if (
+      this.context.pageContext
+        .list!.serverRelativeUrl.toLowerCase()
+        .indexOf("/lists/") == -1
+    ) {
+      var search = document.getElementById("sbcId");
+      while (search!.firstChild) {
+        search!.removeChild(search!.firstChild);
+      }
+      search!.innerHTML = "";
+      ReactDom.render(element, search);
+    }
   }
+  
 }
