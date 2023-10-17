@@ -3,16 +3,17 @@ import { override } from "@microsoft/decorators";
 import {
   BaseApplicationCustomizer,
   PlaceholderContent,
-  PlaceholderName
+  PlaceholderName,
 } from "@microsoft/sp-application-base";
 //import { Dialog } from "@microsoft/sp-dialog";
-import * as React from 'react';
-import * as ReactDom from 'react-dom';
-import SearchResults from './components/SearchResults';
-import { graphfi, SPFx } from '@pnp/graph';
-import { getHttpClient } from './httpClientConfig';
+import * as React from "react";
+import * as ReactDom from "react-dom";
+import SearchResults from "./components/SearchResults";
+import { graphfi, SPFx } from "@pnp/graph";
+import { getHttpClient } from "./httpClientConfig";
+import { SPBrowser, spfi } from "@pnp/sp";
 //import * as strings from "SearchBarApplicationCustomizerStrings";
-import { Version } from '@microsoft/sp-core-library';
+import { Version } from "@microsoft/sp-core-library";
 
 //const LOG_SOURCE: string = "SearchBarApplicationCustomizer";
 
@@ -33,6 +34,14 @@ export default class SearchBarApplicationCustomizer extends BaseApplicationCusto
   @override
   public onInit(): Promise<void> {
     return super.onInit().then((_) => {
+      console.log("starting extension");
+      spfi().using(
+        SPBrowser({
+          baseUrl: `${window.location.protocol}//${window.location.hostname}`,
+        })
+      );
+      console.log("Url:")
+      console.log(`${window.location.protocol}//${window.location.hostname}`);
       graphfi().using(SPFx(this.context));
       getHttpClient(this.context.httpClient);
       this.context.placeholderProvider.changedEvent.add(
@@ -71,13 +80,24 @@ export default class SearchBarApplicationCustomizer extends BaseApplicationCusto
         .list!.serverRelativeUrl.toLowerCase()
         .indexOf("/lists/") == -1
     ) {
-      var search = document.getElementById("sbcId");
+      let search = document.getElementById("sbcId");
+      while (search!.firstChild) {
+        search!.removeChild(search!.firstChild);
+      }
+      search!.innerHTML = "";
+      ReactDom.render(element, search);
+      console.log("React component rendered");
+    }
+
+    /*
+    if (this.topPlaceHolder?.domElement) {
+      let search = document.getElementById("sbcId");
       while (search!.firstChild) {
         search!.removeChild(search!.firstChild);
       }
       search!.innerHTML = "";
       ReactDom.render(element, search);
     }
+    */
   }
-  
 }

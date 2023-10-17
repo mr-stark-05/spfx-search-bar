@@ -58,6 +58,7 @@ export default function SearchResults() {
         const loebLinkProvider = new LoebLinkProvider();
         
         const allPeople: IPersonItem[] = await peopleProvider.GetPeopleItems(searchText);
+        console.log(allPeople);
         const allExp: IExperienceItem[] = await experienceProvider.GetExperienceItems(searchText);
         const allLoeb: any[] = await loebLinkProvider.GetLoebLinkItems(searchText);
 
@@ -89,6 +90,7 @@ export default function SearchResults() {
     const onChange = async(ev: React.ChangeEvent<HTMLInputElement>, newValue: string) => {
 
         setSearchText(newValue);
+        console.log(searchText);
         
         if(newValue.length % 2 == 0 || newValue.length > 4) {
             getListData();
@@ -101,12 +103,12 @@ export default function SearchResults() {
             toggleIsCalloutVisible();
         }
             
-        //var filterPeople = fullPeople.slice(0,4);
+        //let filterPeople = fullPeople.slice(0,4);
         //setPeople(filterPeople);
     }
 
     const onSearch = (searchQuery: string) => {
-        var url = "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/?q=" + searchQuery;
+        let url = "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/?q=" + searchQuery;
         window.location.assign(url); 
     }
 
