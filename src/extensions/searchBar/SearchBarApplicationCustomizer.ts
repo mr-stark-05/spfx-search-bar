@@ -9,9 +9,9 @@ import {
 import * as React from "react";
 import * as ReactDom from "react-dom";
 import SearchResults from "./components/SearchResults";
-import { graphfi, SPFx } from "@pnp/graph";
+//import { graphfi, SPFx } from "@pnp/graph";
 import { getHttpClient } from "./httpClientConfig";
-import { SPBrowser, spfi } from "@pnp/sp";
+//import { SPFx, spfi } from "@pnp/sp";
 //import * as strings from "SearchBarApplicationCustomizerStrings";
 import { Version } from "@microsoft/sp-core-library";
 
@@ -31,18 +31,20 @@ export interface ISearchBarApplicationCustomizerProperties {
 export default class SearchBarApplicationCustomizer extends BaseApplicationCustomizer<ISearchBarApplicationCustomizerProperties> {
   private topPlaceHolder: PlaceholderContent | undefined;
 
+  
+
   @override
   public onInit(): Promise<void> {
     return super.onInit().then((_) => {
-      console.log("starting extension");
-      spfi().using(
-        SPBrowser({
-          baseUrl: `${window.location.protocol}//${window.location.hostname}`,
-        })
-      );
-      console.log("Url:")
-      console.log(`${window.location.protocol}//${window.location.hostname}`);
-      graphfi().using(SPFx(this.context));
+      //console.log("User Context displayName:");
+      //spfi().using(SPFx(this.context));
+      
+      /*
+      this.GetUserData().then(data => {
+        console.log(data);
+      });
+      */
+      //graphfi().using(SPFx(this.context));
       getHttpClient(this.context.httpClient);
       this.context.placeholderProvider.changedEvent.add(
         this,
@@ -71,6 +73,7 @@ export default class SearchBarApplicationCustomizer extends BaseApplicationCusto
     }
     //Create functional component and render in top place holder
     const element: React.ReactElement<{}> = React.createElement(SearchResults, {
+      context: this.context,
       onDispose: this.onDispose,
     });
 
@@ -88,16 +91,16 @@ export default class SearchBarApplicationCustomizer extends BaseApplicationCusto
       ReactDom.render(element, search);
       console.log("React component rendered");
     }
-
-    /*
-    if (this.topPlaceHolder?.domElement) {
-      let search = document.getElementById("sbcId");
-      while (search!.firstChild) {
-        search!.removeChild(search!.firstChild);
-      }
-      search!.innerHTML = "";
-      ReactDom.render(element, search);
-    }
-    */
   }
+
+  /*
+  private async GetUserData(): Promise<any> {
+    console.log("incoming data for user profile");
+    const sp = spfi().using(SPFx(this.context));
+    const data = await sp.profiles.userProfile;
+    
+    return data;
+  }
+  */
+  
 }

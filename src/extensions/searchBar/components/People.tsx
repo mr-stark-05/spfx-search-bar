@@ -1,28 +1,44 @@
+
 import { Link, Persona, PersonaSize, Stack } from "@fluentui/react";
 import * as React from "react";
 import { IPersonItem } from "./model/IPersonItem";
 import { getClassNames } from "./SearchResults.theme";
 import { Text } from '@fluentui/react/lib/Text';
-import PeopleProvider from "./provider/PeopleProvider";
+//import PeopleProvider from "./provider/PeopleProvider";
 import { useBoolean } from "@fluentui/react-hooks";
+//import { ExtensionContext } from '@microsoft/sp-extension-base';
 
 //create interface for people props
 //interface will include search text as string
 export interface IPeopleProps {
     isDesktop: boolean;
     search: string;
+    peopleItems: any;
 }
 
 export default function People(props: IPeopleProps) {
+    
     let {personaText} = getClassNames();
 
+    
     const [people, setPeople] = React.useState<IPersonItem[]>([]);
+    setPeople(props.peopleItems);
+    
     //const [fullPeople, setFullPeople] = React.useState<IPersonItem[]>([]);
+    
     const [peopleDataLoaded, { setTrue: showPeople, setFalse: hidePeople }] = useBoolean(false);
-
+    if(people.length > 0) {
+        setPeople(props.peopleItems);
+        showPeople();
+    }
+    else {
+        hidePeople();
+    }
+    /*
+    
     const getPeopleData = async(): Promise<void> => {
         const peopleProvider = new PeopleProvider();
-        const allPeople: IPersonItem[] = await peopleProvider.GetPeopleItems(props.search);
+        const allPeople: IPersonItem[] = await peopleProvider.GetPeopleItems(props.search, props.context);
         if(allPeople.length > 0) {
             setPeople(allPeople);
             showPeople();
@@ -31,12 +47,15 @@ export default function People(props: IPeopleProps) {
             hidePeople();
         }
     }
+    */
 
+    /*
     React.useEffect(() => {
         if(props.search != "") {
             getPeopleData();
         }
     },[]);
+    */
 
     const MobileComponent = () => {
         return(
@@ -106,5 +125,6 @@ export default function People(props: IPeopleProps) {
             )}
         </div>
     );
+    
 }
 

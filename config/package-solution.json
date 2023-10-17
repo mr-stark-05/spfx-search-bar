@@ -4,6 +4,12 @@
     "name": "search-bar-client-side-solution",
     "id": "021c56d3-3f2d-4822-993f-49b22856e11c",
     "version": "1.0.0.0",
+    "webApiPermissionRequests": [
+      {
+        "resource": "Microsoft.SharePoint",
+        "scope": "Web.FullControl"
+      }
+    ],
     "includeClientSideAssets": true,
     "skipFeatureDeployment": true,
     "isDomainIsolated": false,

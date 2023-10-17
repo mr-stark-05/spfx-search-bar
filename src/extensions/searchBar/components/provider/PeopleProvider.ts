@@ -1,4 +1,4 @@
-import { spfi } from "@pnp/sp/presets/all";
+import { SPFx, spfi } from "@pnp/sp/presets/all";
 //import { IPersonItem } from "../model/IPersonItem";
 import "@pnp/sp/profiles";
 //import { getConfig, getHttpClient } from "../../httpClientConfig";
@@ -8,17 +8,17 @@ import "@pnp/sp/profiles";
 
 export default class PeopleProvider {
     constructor() {
-
     }
                                         // Change back to Promise<IPersonItem[]>
-    public async GetPeopleItems(search: string): Promise<any[]> {
+    public async GetPeopleItems(search: string, context: any): Promise<any[]> {
         //const people = await this.GetPeople(search);
         //let users: Array<IPersonItem>;
+        const sp = spfi().using(SPFx(context));
 
         try {
-            console.log("Here come the people");
-    
-            const results = await spfi().profiles.clientPeoplePickerSearchUser({
+            console.log("Getting the user sir");
+
+            const results = await sp.profiles.clientPeoplePickerSearchUser({
                 AllowEmailAddresses: true,
                 AllowMultipleEntities: true,
                 MaximumEntitySuggestions: 4,
@@ -26,13 +26,12 @@ export default class PeopleProvider {
                 PrincipalType: 1, // User
                 QueryString: search
             });
-    
-            console.log(results);
-    
+
             let emailResults = [];
     
             for (let item of results) {
                 const login = item.Key;
+                console.log("login" + login);
                 if (login && login.startsWith("i:0#.f|membership")) {
                     const profile = await spfi().profiles.getPropertiesFor(login);
                     emailResults.push({

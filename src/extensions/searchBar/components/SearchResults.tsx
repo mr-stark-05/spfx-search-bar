@@ -7,40 +7,51 @@ import "@pnp/graph/users";
 import "@pnp/graph/onedrive";
 import { IPersonItem } from "./model/IPersonItem";
 import * as React from 'react';
+
 import { 
-    Link, 
+    //Link, 
     SearchBox,
     Stack,
-    Callout,
-    Shimmer,
-    DirectionalHint,
+    //Callout,
+    //Shimmer,
+    //DirectionalHint,
 } from "@fluentui/react";
+
 import PeopleProvider from "./provider/PeopleProvider";
 import { useBoolean, useId } from "@fluentui/react-hooks";
 import { getClassNames } from "./SearchResults.theme";
-import People from "./People";
+//import People from "./People";
 import { IExperienceItem } from "./model/IExperienceItem";
 import ExperienceProvider from "./provider/ExperienceProvider";
 import LoebLinkProvider from "./provider/LoebLinkProvider";
-import ExperienceLoeblink from "./ExperienceLoebLink";
-import { useMediaQuery } from "react-responsive";
+//import ExperienceLoeblink from "./ExperienceLoebLink";
+//import { useMediaQuery } from "react-responsive";
+import { ExtensionContext } from '@microsoft/sp-extension-base';
 
-export default function SearchResults() {
+interface ISearchResultsProps {
+  context: ExtensionContext;
+  onDispose: () => void;
+}
 
+export default function SearchResults(props: ISearchResultsProps) {
+
+    
     let {
         searchBox,
         suggestionDiv,
-        calloutStyles,
-        shimmerStyle,
-        moreLink,
+        //calloutStyles,
+        //shimmerStyle,
+        //moreLink,
     } = getClassNames();
+    
+    
 
     //Arrays needed to hold search results
     //const [people, setPeople] = React.useState<IPersonItem[]>([]);
     const [fullPeople, setFullPeople] = React.useState<IPersonItem[]>([]);
-    const [exp, setExp] = React.useState<IExperienceItem[]>([]);
+    //const [exp, setExp] = React.useState<IExperienceItem[]>([]);
     const [fullExp, setFullExp] = React.useState<IExperienceItem[]>([]);
-    const [loeb, setLoeb] = React.useState<any[]>([]);
+    //const [loeb, setLoeb] = React.useState<any[]>([]);
     //const [fullLoeb, setFullLoeb] = React.useState<any[]>([]);
     const [searchText, setSearchText] = React.useState<string>("");
 
@@ -57,22 +68,22 @@ export default function SearchResults() {
         const experienceProvider = new ExperienceProvider();
         const loebLinkProvider = new LoebLinkProvider();
         
-        const allPeople: IPersonItem[] = await peopleProvider.GetPeopleItems(searchText);
-        console.log(allPeople);
+        const allPeople: IPersonItem[] = await peopleProvider.GetPeopleItems(searchText, props.context);
         const allExp: IExperienceItem[] = await experienceProvider.GetExperienceItems(searchText);
         const allLoeb: any[] = await loebLinkProvider.GetLoebLinkItems(searchText);
 
         //setPeople(allPeople);
         setFullPeople(allPeople);
         if(allExp.length > 0) {
-            setExp(allExp);
+            //setExp(allExp);
             setFullExp(allExp);
         }
         if(allLoeb.length > 0) {
-            setLoeb(allLoeb);
+            //setLoeb(allLoeb);
             //setFullLoeb(allLoeb);
         }
     }
+    
     
     React.useEffect(() => {
         if(fullPeople.length > 0 && !peopleDataLoaded) {
@@ -81,7 +92,7 @@ export default function SearchResults() {
         if(fullExp.length > 0 && !expDataLoaded) {
             toggleExpDataLoaded();
         }
-    });
+    }, [fullPeople, fullExp]);
 
     const onAbort = () => {
         //setPeople(fullPeople);
@@ -111,26 +122,37 @@ export default function SearchResults() {
         let url = "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/?q=" + searchQuery;
         window.location.assign(url); 
     }
+    
 
+    /*
     //props for functional components
     const isDesktop = useMediaQuery({
         query: "(min-width: 700px)"
     });
+    */
 
+    /*
     const peopleProps = {
         isDesktop: isDesktop,
-        search: searchText
+        search: searchText,
+        peopleItems: fullPeople
+        //context: props.context,
+        //onDispose: props.onDispose
     }
+    */
 
+    /*
     const experienceLoebLinkProps = {
         loeb: loeb,
         exp: exp,
         link: "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/?q=" + searchText,
         isDesktop: isDesktop
     }
+    */
 
-    const peopleSearch: string = "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/people?q=" + searchText;
+    //const peopleSearch: string = "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/people?q=" + searchText;
 
+    
     return(
         <div id="searchExtension" className={suggestionDiv}>
                 <Stack>
@@ -143,6 +165,7 @@ export default function SearchResults() {
                             id={searchBoxId}
                         />
                     </Stack.Item>
+                    {/*
                     <Stack.Item>
                         {isCalloutVisible && (
                             <Callout
@@ -172,8 +195,10 @@ export default function SearchResults() {
                             </Callout>
                         )}
                     </Stack.Item>
+                        */}
                 </Stack>
         </div>
     )
+    
 }
 
