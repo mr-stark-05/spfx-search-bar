@@ -1,23 +1,16 @@
 import { SPFx, spfi } from "@pnp/sp/presets/all";
-//import { IPersonItem } from "../model/IPersonItem";
 import "@pnp/sp/profiles";
-//import { getConfig, getHttpClient } from "../../httpClientConfig";
-//import { ISPHttpClientOptions } from "@microsoft/sp-http";
-//import { Users } from "@pnp/graph/users";
-//import { HttpClient } from "@microsoft/sp-http";
+import { IPersonItem } from "../model/IPersonItem";
 
 export default class PeopleProvider {
-    constructor() {
-    }
-                                        // Change back to Promise<IPersonItem[]>
-    public async GetPeopleItems(search: string, context: any): Promise<any[]> {
-        //const people = await this.GetPeople(search);
-        //let users: Array<IPersonItem>;
+    public async GetPeopleItems(search: string, context: any): Promise<IPersonItem[]> {
+
+        // Set context for spfi
         const sp = spfi().using(SPFx(context));
 
         try {
-            console.log("Getting the user sir");
 
+            // Get initial results based on query string
             const results = await sp.profiles.clientPeoplePickerSearchUser({
                 AllowEmailAddresses: true,
                 AllowMultipleEntities: true,
@@ -27,23 +20,29 @@ export default class PeopleProvider {
                 QueryString: search
             });
 
-            let emailResults = [];
+            // Array used to hold results from the next query
+            let profileResults: IPersonItem[] = [];
     
+            // Next query used to get user profile information
             for (let item of results) {
                 const login = item.Key;
-                console.log("login" + login);
                 if (login && login.startsWith("i:0#.f|membership")) {
-                    const profile = await spfi().profiles.getPropertiesFor(login);
-                    emailResults.push({
-                        Email: profile.Email,
-                        Url: profile.UserUrl
+                    const profile = await sp.profiles.getPropertiesFor(login);
+                    
+                    profileResults.push({
+                        JobTitle: profile.Title,
+                        DisplayName: profile.DisplayName,
+                        FirstName: profile.UserProfileProperties[4].Value,
+                        LastName: profile.UserProfileProperties[6].Value,
+                        Department: profile.UserProfileProperties[11].Value,
+                        Office: "string",
+                        WorkPhone: profile.UserProfileProperties[10].Value,
+                        PictureUrl: "string",
+                        ProfileUrl: profile.UserUrl
                     });
                 }
             }
-    
-            console.log(emailResults);
-            return emailResults;
-    
+            return profileResults;
         } catch (error) {
             console.error("Error in GetPeopleItems:", error);
             throw error;  // Re-throw the error if you want it to be caught higher up, or handle it here as needed.

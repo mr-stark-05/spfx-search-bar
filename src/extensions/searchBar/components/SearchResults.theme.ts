@@ -56,7 +56,10 @@ export const getClassNames = (): IComponentClassNames => {
             color: "rgb(96, 94, 92)"
         },
         shimmerStyle: { 
-            padding: "20px",
+            paddingTop: "5px", // No padding on the top
+            paddingRight: "20px",
+            paddingBottom: "20px",
+            paddingLeft: "20px"
         },
         stackItem: {
             width: "50%"

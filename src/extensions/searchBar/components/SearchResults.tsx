@@ -6,199 +6,218 @@ import "@pnp/sp/files";
 import "@pnp/graph/users";
 import "@pnp/graph/onedrive";
 import { IPersonItem } from "./model/IPersonItem";
-import * as React from 'react';
+import * as React from "react";
 
-import { 
-    //Link, 
-    SearchBox,
-    Stack,
-    //Callout,
-    //Shimmer,
-    //DirectionalHint,
+import {
+  Link,
+  SearchBox,
+  Stack,
+  Callout,
+  Shimmer,
+  DirectionalHint,
 } from "@fluentui/react";
 
 import PeopleProvider from "./provider/PeopleProvider";
 import { useBoolean, useId } from "@fluentui/react-hooks";
 import { getClassNames } from "./SearchResults.theme";
-//import People from "./People";
+import People from "./People";
 import { IExperienceItem } from "./model/IExperienceItem";
 import ExperienceProvider from "./provider/ExperienceProvider";
 import LoebLinkProvider from "./provider/LoebLinkProvider";
-//import ExperienceLoeblink from "./ExperienceLoebLink";
-//import { useMediaQuery } from "react-responsive";
-import { ExtensionContext } from '@microsoft/sp-extension-base';
+import ExperienceLoeblink from "./ExperienceLoebLink";
+import { useMediaQuery } from "react-responsive";
+import { ExtensionContext } from "@microsoft/sp-extension-base";
 
 interface ISearchResultsProps {
   context: ExtensionContext;
   onDispose: () => void;
 }
 
+// Debounce function to delay the execution of a function
+// until after a certain amount of time has passed since the last time the debounced function was invoked.
+const debounce = (func: (...args: any[]) => void, wait: number) => {
+  let timeout: number | null;
+  return function executedFunction(...args: any[]) {
+    const later = () => {
+      if (timeout !== null) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      func(...args);
+    };
+    if (timeout !== null) {
+      clearTimeout(timeout);
+    }
+    timeout = setTimeout(later, wait) as unknown as number; // Explicit cast here
+  };
+};
+
 export default function SearchResults(props: ISearchResultsProps) {
+  let { searchBox, suggestionDiv, calloutStyles, shimmerStyle, moreLink } =
+    getClassNames();
 
-    
-    let {
-        searchBox,
-        suggestionDiv,
-        //calloutStyles,
-        //shimmerStyle,
-        //moreLink,
-    } = getClassNames();
-    
-    
+  //Arrays needed to hold search results
+  const [people, setPeople] = React.useState<IPersonItem[]>([]);
+  //const [fullPeople, setFullPeople] = React.useState<IPersonItem[]>([]);
+  const [exp, setExp] = React.useState<IExperienceItem[]>([]);
+  //const [fullExp, setFullExp] = React.useState<IExperienceItem[]>([]);
+  const [loeb, setLoeb] = React.useState<any[]>([]);
+  //const [fullLoeb, setFullLoeb] = React.useState<any[]>([]);
+  const [searchText, setSearchText] = React.useState<string>("");
 
-    //Arrays needed to hold search results
-    //const [people, setPeople] = React.useState<IPersonItem[]>([]);
-    const [fullPeople, setFullPeople] = React.useState<IPersonItem[]>([]);
-    //const [exp, setExp] = React.useState<IExperienceItem[]>([]);
-    const [fullExp, setFullExp] = React.useState<IExperienceItem[]>([]);
-    //const [loeb, setLoeb] = React.useState<any[]>([]);
-    //const [fullLoeb, setFullLoeb] = React.useState<any[]>([]);
-    const [searchText, setSearchText] = React.useState<string>("");
+  //Id used as target for Callout
+  const searchBoxId = useId("search-bar");
 
-    //Id used as target for Callout
-    const searchBoxId = useId("search-bar");
+  const [isCalloutVisible, { toggle: toggleIsCalloutVisible }] =
+    useBoolean(false);
+  const [peopleDataLoaded, { toggle: togglePeopleLoaded }] = useBoolean(false);
+  const [expLoebDataLoaded, { toggle: toggleExpLoebDataLoaded }] = useBoolean(false);
 
-    const [isCalloutVisible, { toggle: toggleIsCalloutVisible }] = useBoolean(false);
-    const [peopleDataLoaded, { toggle: togglePeopleLoaded }] = useBoolean(false);
-    const [expDataLoaded, { toggle: toggleExpDataLoaded }] = useBoolean(false);
+  //Get each list and set the arrays
+  const getListData = async (): Promise<void> => {
+    const peopleProvider = new PeopleProvider();
+    const experienceProvider = new ExperienceProvider();
+    const loebLinkProvider = new LoebLinkProvider();
 
-    //Get each list and set the arrays
-    const getListData = async(): Promise<void> => {
-        const peopleProvider = new PeopleProvider();
-        const experienceProvider = new ExperienceProvider();
-        const loebLinkProvider = new LoebLinkProvider();
-        
-        const allPeople: IPersonItem[] = await peopleProvider.GetPeopleItems(searchText, props.context);
-        const allExp: IExperienceItem[] = await experienceProvider.GetExperienceItems(searchText);
-        const allLoeb: any[] = await loebLinkProvider.GetLoebLinkItems(searchText);
-
-        //setPeople(allPeople);
-        setFullPeople(allPeople);
-        if(allExp.length > 0) {
-            //setExp(allExp);
-            setFullExp(allExp);
-        }
-        if(allLoeb.length > 0) {
-            //setLoeb(allLoeb);
-            //setFullLoeb(allLoeb);
-        }
-    }
-    
-    
-    React.useEffect(() => {
-        if(fullPeople.length > 0 && !peopleDataLoaded) {
-            togglePeopleLoaded();
-        }
-        if(fullExp.length > 0 && !expDataLoaded) {
-            toggleExpDataLoaded();
-        }
-    }, [fullPeople, fullExp]);
-
-    const onAbort = () => {
-        //setPeople(fullPeople);
+    const allPeople: IPersonItem[] = await peopleProvider.GetPeopleItems(
+      searchText,
+      props.context
+    );
+    if (JSON.stringify(allPeople) !== JSON.stringify(people)) {
+      setPeople(allPeople);
     }
 
-    const onChange = async(ev: React.ChangeEvent<HTMLInputElement>, newValue: string) => {
-
-        setSearchText(newValue);
-        console.log(searchText);
-        
-        if(newValue.length % 2 == 0 || newValue.length > 4) {
-            getListData();
-        }
-
-        if(newValue.length != 0 && !isCalloutVisible) {
-            toggleIsCalloutVisible();
-        }
-        else if (newValue.length == 0 && isCalloutVisible){
-            toggleIsCalloutVisible();
-        }
-            
-        //let filterPeople = fullPeople.slice(0,4);
-        //setPeople(filterPeople);
+    const allExp: IExperienceItem[] =
+      await experienceProvider.GetExperienceItems(searchText, props.context);
+    if (JSON.stringify(allExp) !== JSON.stringify(exp)) {
+      setExp(exp);
     }
 
-    const onSearch = (searchQuery: string) => {
-        let url = "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/?q=" + searchQuery;
-        window.location.assign(url); 
+    const allLoeb: any[] = await loebLinkProvider.GetLoebLinkItems(searchText);
+
+    if (allPeople.length > 0) {
+      setPeople(allPeople);
+      //setFullPeople(allPeople);
     }
-    
-
-    /*
-    //props for functional components
-    const isDesktop = useMediaQuery({
-        query: "(min-width: 700px)"
-    });
-    */
-
-    /*
-    const peopleProps = {
-        isDesktop: isDesktop,
-        search: searchText,
-        peopleItems: fullPeople
-        //context: props.context,
-        //onDispose: props.onDispose
+    if (allExp.length > 0) {
+      setExp(allExp);
+      //setFullExp(allExp);
     }
-    */
-
-    /*
-    const experienceLoebLinkProps = {
-        loeb: loeb,
-        exp: exp,
-        link: "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/?q=" + searchText,
-        isDesktop: isDesktop
+    if (allLoeb.length > 0) {
+      setLoeb(allLoeb);
+      //setFullLoeb(allLoeb);
     }
-    */
+  };
 
-    //const peopleSearch: string = "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/people?q=" + searchText;
+  React.useEffect(() => {
+    if (people.length > 0 && !peopleDataLoaded) {
+      togglePeopleLoaded();
+    }
 
-    
-    return(
-        <div id="searchExtension" className={suggestionDiv}>
-                <Stack>
-                    <Stack.Item>
-                        <SearchBox
-                            className={searchBox}
-                            onChange={onChange}
-                            onAbort={onAbort}
-                            onSearch={onSearch}
-                            id={searchBoxId}
-                        />
-                    </Stack.Item>
-                    {/*
-                    <Stack.Item>
-                        {isCalloutVisible && (
-                            <Callout
-                                onDismiss={toggleIsCalloutVisible}
-                                shouldUpdateWhenHidden={true}
-                                target={`#${searchBoxId}`}
-                                isBeakVisible={false}
-                                calloutMaxWidth={700}
-                                calloutMinWidth={300}
-                                className={calloutStyles}
-                                directionalHint={DirectionalHint.bottomCenter}
-                            >
-                                <Shimmer
-                                    isDataLoaded={peopleDataLoaded}
-                                    className={shimmerStyle}
-                                >
-                                    <People {...peopleProps}></People>
-                                    <br></br>
-                                    <Link className={moreLink} href={peopleSearch}>More...</Link>
-                                </Shimmer>
-                                <Shimmer
-                                    isDataLoaded={expDataLoaded}
-                                    className={shimmerStyle}
-                                >
-                                    <ExperienceLoeblink {...experienceLoebLinkProps}></ExperienceLoeblink>
-                                </Shimmer>
-                            </Callout>
-                        )}
-                    </Stack.Item>
-                        */}
-                </Stack>
-        </div>
-    )
-    
+    if ((exp.length > 0 && !expLoebDataLoaded) || (loeb.length > 0 && !expLoebDataLoaded)) {
+      toggleExpLoebDataLoaded();
+    }
+  }, [people, exp]);
+
+  const onAbort = () => {
+    //setPeople(fullPeople);
+  };
+
+  const onChange = async (
+    ev: React.ChangeEvent<HTMLInputElement>,
+    newValue: string
+  ) => {
+    setSearchText(newValue);
+
+    if (newValue.length % 2 === 0 || newValue.length > 4) {
+      getListData();
+    }
+
+    if (newValue.length !== 0 && !isCalloutVisible) {
+      toggleIsCalloutVisible();
+    } else if (newValue.length === 0 && isCalloutVisible) {
+      toggleIsCalloutVisible();
+    }
+  };
+
+  // Debounced version of the onChange function to prevent rapid API calls
+  const debouncedOnChange = debounce(onChange, 300); // 300ms delay
+
+  const onSearch = (searchQuery: string) => {
+    let url =
+      "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/?q=" +
+      searchQuery;
+    window.location.assign(url);
+  };
+
+  //props for functional components
+  const isDesktop = useMediaQuery({
+    query: "(min-width: 700px)",
+  });
+
+  const peopleProps = {
+    isDesktop: isDesktop,
+    search: searchText,
+    peopleItems: people,
+    context: props.context,
+    onDispose: props.onDispose,
+  };
+
+  const experienceLoebLinkProps = {
+    loeb: loeb,
+    exp: exp,
+    link:
+      "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/?q=" +
+      searchText,
+    isDesktop: isDesktop,
+  };
+
+  const peopleSearch: string =
+    "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/people?q=" +
+    searchText;
+
+  return (
+    <div id="searchExtension" className={suggestionDiv}>
+      <Stack>
+        <Stack.Item>
+          <SearchBox
+            className={searchBox}
+            onChange={debouncedOnChange}
+            onAbort={onAbort}
+            onSearch={onSearch}
+            id={searchBoxId}
+          />
+        </Stack.Item>
+
+        <Stack.Item>
+          {isCalloutVisible && (
+            <Callout
+              onDismiss={toggleIsCalloutVisible}
+              shouldUpdateWhenHidden={true}
+              target={`#${searchBoxId}`}
+              isBeakVisible={false}
+              calloutMaxWidth={700}
+              calloutMinWidth={300}
+              className={calloutStyles}
+              directionalHint={DirectionalHint.bottomCenter}
+            >
+              <Shimmer isDataLoaded={peopleDataLoaded} className={shimmerStyle}>
+                <People {...peopleProps}></People>
+                <br></br>
+                <Link className={moreLink} href={peopleSearch}>
+                  More...
+                </Link>
+              </Shimmer>
+
+              <Shimmer isDataLoaded={expLoebDataLoaded} className={shimmerStyle}>
+                <ExperienceLoeblink
+                  {...experienceLoebLinkProps}
+                ></ExperienceLoeblink>
+              </Shimmer>
+            </Callout>
+          )}
+        </Stack.Item>
+      </Stack>
+    </div>
+  );
 }
-

@@ -1,27 +1,15 @@
-import { spfi, SPBrowser } from "@pnp/sp/presets/all";
+//import { spfi, SPBrowser, SPFx } from "@pnp/sp/presets/all";
 import { IExperienceItem } from "../model/IExperienceItem";
 //import { ISPFXContext } from "@pnp/common";
 //import { graphfi } from "@pnp/graph";
 import "@pnp/graph/search";
 
 export default class ExperienceProvider {
-    constructor() {
-        spfi().using(SPBrowser({
-            baseUrl:`${window.location.protocol}//${window.location.hostname}`
-        }));
-        /*
-        sp.setup({
-            sp: {
-                headers: {
-                    Accept: "application/json;odata=verbose"
-                },
-                baseUrl: `${window.location.protocol}//${window.location.hostname}`,
-            }
-        });
-        */
-    }
-
-    public async GetExperienceItems(search: string): Promise<IExperienceItem[]> {
+    public async GetExperienceItems(search: string, context: any): Promise<IExperienceItem[]> {
+        
+        // Set context for spfi
+        //const sp = spfi().using(SPFx(context));
+        
         let experiences : Array<IExperienceItem> = [];
         experiences.push({Title: "Represented Gap in Collaboration with Kanye West and Balenciaga", 
             Abstract: "Represented Gap in its collaboration with Yeezy, a high-fashion clothing brand created by Ye (formerly known as Kanye West), and Balenciaga, a Paris-based luxury powerhouse brand.", 
