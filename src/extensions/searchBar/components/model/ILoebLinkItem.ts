@@ -1,5 +1,5 @@
 export interface ILoebLinkItem {
-    Title: string;
-    Author: string;
-    Link: string;
+    Title: string | undefined;
+    Author: string | undefined;
+    Link: string | undefined;
 }

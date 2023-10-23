@@ -1,33 +1,39 @@
-import { spfi, SPBrowser } from "@pnp/sp/presets/all";
+import { spfi, SPFx } from "@pnp/sp/presets/all";
 import "@pnp/sp/search";
 import { ISearchQuery } from "@pnp/sp/search";
 //import { graphfi } from "@pnp/graph";
 import "@pnp/graph/search";
+import { ILoebLinkItem } from "../model/ILoebLinkItem";
 
 export default class LoebLinkProvider {
-    constructor() {
-        spfi().using(SPBrowser({
-            baseUrl:`${window.location.protocol}//${window.location.hostname}`
-        }));
-        /*
-        sp.setup({
-            sp: {
-                headers: {
-                    Accept: "application/json;odata=verbose"
-                },
-                baseUrl: `${window.location.protocol}//${window.location.hostname}`,
-            }
+
+    public async GetLoebLinkItems(search: string, context: any): Promise<ILoebLinkItem[]> {
+        // Set context for spfi
+        const sp = spfi().using(SPFx(context));
+
+        let listItems: ILoebLinkItem[] = [];
+        const results = await sp.search(<ISearchQuery>{
+            Querytext: search,
+            RowLimit: 5
         });
-        */
+        const primaryResults = results.PrimarySearchResults;
+        primaryResults.forEach((prop) => {
+            listItems.push({
+                Title: prop.Title,
+                Author: prop.Author,
+                Link: prop.Path
+            })
+        });
+        return listItems;
     }
 
-    public async GetLoebLinkItems(search: string): Promise<any[]> {
-        const loeblinkitems = await this.GetLoebLink(search);
-        return loeblinkitems;
-    }
+    /*
+    private async GetLoebLink(search: string, context: any): Promise<any[]> {
 
-    private async GetLoebLink(search: string): Promise<any[]> {
-        var listItems: any[] = [];
+        // Set context for spfi
+        //const sp = spfi().using(SPFx(context));
+
+        let listItems: any[] = [];
         const results = await spfi().search(<ISearchQuery>{
             Querytext: search,
             RowLimit: 5
@@ -45,4 +51,5 @@ export default class LoebLinkProvider {
         
         return listItems;
     }
+    */
 }

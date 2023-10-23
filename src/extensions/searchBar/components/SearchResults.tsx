@@ -9,7 +9,6 @@ import { IPersonItem } from "./model/IPersonItem";
 import * as React from "react";
 
 import {
-  Link,
   SearchBox,
   Stack,
   Callout,
@@ -53,7 +52,7 @@ const debounce = (func: (...args: any[]) => void, wait: number) => {
 };
 
 export default function SearchResults(props: ISearchResultsProps) {
-  let { searchBox, suggestionDiv, calloutStyles, shimmerStyle, moreLink } =
+  let { searchBox, suggestionDiv, calloutStyles, shimmerStyle } =
     getClassNames();
 
   //Arrays needed to hold search results
@@ -67,6 +66,7 @@ export default function SearchResults(props: ISearchResultsProps) {
 
   //Id used as target for Callout
   const searchBoxId = useId("search-bar");
+  console.log("item cell remove left margin");
 
   const [isCalloutVisible, { toggle: toggleIsCalloutVisible }] =
     useBoolean(false);
@@ -93,7 +93,7 @@ export default function SearchResults(props: ISearchResultsProps) {
       setExp(exp);
     }
 
-    const allLoeb: any[] = await loebLinkProvider.GetLoebLinkItems(searchText);
+    const allLoeb: any[] = await loebLinkProvider.GetLoebLinkItems(searchText, props.context);
 
     if (allPeople.length > 0) {
       setPeople(allPeople);
@@ -155,9 +155,14 @@ export default function SearchResults(props: ISearchResultsProps) {
     query: "(min-width: 700px)",
   });
 
+  const peopleSearch: string =
+    "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/people?q=" +
+    searchText;
+
   const peopleProps = {
     isDesktop: isDesktop,
     search: searchText,
+    peopleSearch: peopleSearch,
     peopleItems: people,
     context: props.context,
     onDispose: props.onDispose,
@@ -172,9 +177,7 @@ export default function SearchResults(props: ISearchResultsProps) {
     isDesktop: isDesktop,
   };
 
-  const peopleSearch: string =
-    "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/people?q=" +
-    searchText;
+  
 
   return (
     <div id="searchExtension" className={suggestionDiv}>
@@ -203,17 +206,12 @@ export default function SearchResults(props: ISearchResultsProps) {
             >
               <Shimmer isDataLoaded={peopleDataLoaded} className={shimmerStyle}>
                 <People {...peopleProps}></People>
-                <br></br>
-                <Link className={moreLink} href={peopleSearch}>
-                  More...
-                </Link>
               </Shimmer>
-
-              <Shimmer isDataLoaded={expLoebDataLoaded} className={shimmerStyle}>
-                <ExperienceLoeblink
-                  {...experienceLoebLinkProps}
-                ></ExperienceLoeblink>
-              </Shimmer>
+			        {expLoebDataLoaded && (
+                <Shimmer isDataLoaded={expLoebDataLoaded} className={shimmerStyle}>
+                  <ExperienceLoeblink {...experienceLoebLinkProps}></ExperienceLoeblink>
+                </Shimmer>
+			      )}
             </Callout>
           )}
         </Stack.Item>

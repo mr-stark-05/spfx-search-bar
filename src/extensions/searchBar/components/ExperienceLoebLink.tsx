@@ -17,18 +17,18 @@ export interface IExperienceLoebLinkProps {
 
 export default function ExperienceLoeblink(props: IExperienceLoebLinkProps) {
 
-    let {stackItem} = getClassNames();
+    let {stackItem, h3Style} = getClassNames();
 
     const MobileComponent = () => {
         return(
             <div>
                 <Stack>
                     <Stack.Item>
-                        <h3>Experiences</h3>
+                        <h3 className={h3Style}>Experiences</h3>
                         <Experience {...props}></Experience>
                     </Stack.Item>
                     <Stack.Item>
-                        <h3>LoebLink</h3>
+                        <h3 className={h3Style}>LoebLink</h3>
                         <LoebLink {...props}></LoebLink>
                     </Stack.Item>
                 </Stack>
@@ -40,11 +40,11 @@ export default function ExperienceLoeblink(props: IExperienceLoebLinkProps) {
         return(
             <Stack horizontal={true} horizontalAlign="space-evenly">
                 <Stack.Item className={stackItem}>
-                    <h3>Experiences</h3>
+                    <h3 className={h3Style}>Experiences</h3>
                     <Experience {...props}></Experience>
                 </Stack.Item>
                 <Stack.Item className={stackItem}>
-                    <h3>LoebLink</h3>
+                    <h3 className={h3Style}>LoebLink</h3>
                     <LoebLink {...props}></LoebLink>
                 </Stack.Item>
             </Stack>

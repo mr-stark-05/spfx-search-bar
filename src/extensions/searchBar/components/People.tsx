@@ -7,12 +7,13 @@ import { useBoolean } from "@fluentui/react-hooks";
 export interface IPeopleProps {
     isDesktop: boolean;
     search: string;
+    peopleSearch: string;
     peopleItems: IPersonItem[];
 }
 
-const People: React.FC<IPeopleProps> = (props) => {
+const People: React.FC<IPeopleProps> = (props: IPeopleProps) => {
     
-    const {personaText} = getClassNames();
+    const {personaText, peopleMoreLink, h3Style} = getClassNames();
     const filteredPeople = props.peopleItems.slice(0, 4);
     
     const [peopleDataLoaded, { setTrue: showPeople, setFalse: hidePeople }] = useBoolean(false);
@@ -28,18 +29,18 @@ const People: React.FC<IPeopleProps> = (props) => {
     return (
         <>
             {peopleDataLoaded && props.isDesktop && (
-                <DesktopComponent people={filteredPeople} personaText={personaText} />
+                <DesktopComponent people={filteredPeople} moreLink={peopleMoreLink} peopleSearch={props.peopleSearch} personaText={personaText} h3Style={h3Style} />
             )}
             {peopleDataLoaded && !props.isDesktop && (
-                <MobileComponent people={filteredPeople} />
+                <MobileComponent people={filteredPeople} moreLink={peopleMoreLink} peopleSearch={props.peopleSearch} h3Style={h3Style} />
             )}
         </>
     );
 }
 
-const DesktopComponent: React.FC<{ people: IPersonItem[], personaText: string }> = ({ people, personaText }) => (
+const DesktopComponent: React.FC<{ people: IPersonItem[], moreLink: string, peopleSearch: string, personaText: string, h3Style: string }> = ({ people, moreLink, peopleSearch, personaText, h3Style }) => (
     <div>
-        <h3>People</h3>
+        <h3 className={h3Style}>People</h3>
         <Stack horizontal={true} horizontalAlign="start" tokens={{childrenGap: 5, padding:10}}>
             {people.map((person) => (
                 <Stack.Item key={person.ProfileUrl}>
@@ -63,12 +64,13 @@ const DesktopComponent: React.FC<{ people: IPersonItem[], personaText: string }>
                 </Stack.Item>
             ))}
         </Stack>
+        <Link className={moreLink} href={peopleSearch}>More...</Link>
     </div>
 );
 
-const MobileComponent: React.FC<{ people: IPersonItem[] }> = ({ people }) => (
+const MobileComponent: React.FC<{ people: IPersonItem[], moreLink: string, peopleSearch: string, h3Style: string }> = ({ people, moreLink, peopleSearch, h3Style }) => (
     <div>
-        <h3>People</h3>
+        <h3 className={h3Style}>People</h3>
         <Stack horizontal={false}>
             {people.map((person) => (
                 <Stack.Item key={person.ProfileUrl}>
@@ -83,6 +85,7 @@ const MobileComponent: React.FC<{ people: IPersonItem[] }> = ({ people }) => (
                 </Stack.Item>
             ))}
         </Stack>
+        <Link className={moreLink} href={peopleSearch}>More...</Link>
     </div>
 );
 

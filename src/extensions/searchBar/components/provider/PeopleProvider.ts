@@ -28,6 +28,7 @@ export default class PeopleProvider {
                 const login = item.Key;
                 if (login && login.startsWith("i:0#.f|membership")) {
                     const profile = await sp.profiles.getPropertiesFor(login);
+                    console.log(profile);
                     
                     profileResults.push({
                         JobTitle: profile.Title,
@@ -35,7 +36,7 @@ export default class PeopleProvider {
                         FirstName: profile.UserProfileProperties[4].Value,
                         LastName: profile.UserProfileProperties[6].Value,
                         Department: profile.UserProfileProperties[11].Value,
-                        Office: "string",
+                        Office: profile.UserProfileProperties[61].Value,
                         WorkPhone: profile.UserProfileProperties[10].Value,
                         PictureUrl: "string",
                         ProfileUrl: profile.UserUrl
