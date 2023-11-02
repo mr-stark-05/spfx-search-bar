@@ -13,7 +13,7 @@ export interface IPeopleProps {
 
 const People: React.FC<IPeopleProps> = (props: IPeopleProps) => {
     
-    const {personaText, peopleMoreLink, h3Style} = getClassNames();
+    const {personaText, moreLink, h3Style} = getClassNames();
     const filteredPeople = props.peopleItems.slice(0, 4);
     
     const [peopleDataLoaded, { setTrue: showPeople, setFalse: hidePeople }] = useBoolean(false);
@@ -29,10 +29,10 @@ const People: React.FC<IPeopleProps> = (props: IPeopleProps) => {
     return (
         <>
             {peopleDataLoaded && props.isDesktop && (
-                <DesktopComponent people={filteredPeople} moreLink={peopleMoreLink} peopleSearch={props.peopleSearch} personaText={personaText} h3Style={h3Style} />
+                <DesktopComponent people={filteredPeople} moreLink={moreLink} peopleSearch={props.peopleSearch} personaText={personaText} h3Style={h3Style} />
             )}
             {peopleDataLoaded && !props.isDesktop && (
-                <MobileComponent people={filteredPeople} moreLink={peopleMoreLink} peopleSearch={props.peopleSearch} h3Style={h3Style} />
+                <MobileComponent people={filteredPeople} moreLink={moreLink} peopleSearch={props.peopleSearch} h3Style={h3Style} />
             )}
         </>
     );
@@ -64,6 +64,7 @@ const DesktopComponent: React.FC<{ people: IPersonItem[], moreLink: string, peop
                 </Stack.Item>
             ))}
         </Stack>
+        <br></br>
         <Link className={moreLink} href={peopleSearch}>More...</Link>
     </div>
 );
@@ -85,6 +86,7 @@ const MobileComponent: React.FC<{ people: IPersonItem[], moreLink: string, peopl
                 </Stack.Item>
             ))}
         </Stack>
+        <br></br>
         <Link className={moreLink} href={peopleSearch}>More...</Link>
     </div>
 );

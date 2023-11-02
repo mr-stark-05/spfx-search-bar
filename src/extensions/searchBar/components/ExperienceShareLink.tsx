@@ -3,19 +3,19 @@ import * as React from "react";
 //import { IPersonItem } from "./model/IPersonItem";
 import { getClassNames } from "./SearchResults.theme";
 //import { Text } from '@fluentui/react/lib/Text';
-import { ILoebLinkItem } from "./model/ILoebLinkItem";
+import { IShareLinkItem } from "./model/IShareLinkItem";
 import Experience from "./Experience";
-import LoebLink from "./LoebLink";
+import ShareLink from "./ShareLink";
 import { IExperienceItem } from "./model/IExperienceItem";
 
-export interface IExperienceLoebLinkProps {
-    loeb: ILoebLinkItem[];
+export interface IExperienceShareLinkProps {
+    share: IShareLinkItem[];
     exp: IExperienceItem[];
     link: string;
     isDesktop: boolean;
 }
 
-export default function ExperienceLoeblink(props: IExperienceLoebLinkProps) {
+export default function ExperienceShareLink(props: IExperienceShareLinkProps) {
 
     let {stackItem, h3Style} = getClassNames();
 
@@ -28,8 +28,8 @@ export default function ExperienceLoeblink(props: IExperienceLoebLinkProps) {
                         <Experience {...props}></Experience>
                     </Stack.Item>
                     <Stack.Item>
-                        <h3 className={h3Style}>LoebLink</h3>
-                        <LoebLink {...props}></LoebLink>
+                        <h3 className={h3Style}>ShareLink</h3>
+                        <ShareLink {...props}></ShareLink>
                     </Stack.Item>
                 </Stack>
             </div>
@@ -44,8 +44,8 @@ export default function ExperienceLoeblink(props: IExperienceLoebLinkProps) {
                     <Experience {...props}></Experience>
                 </Stack.Item>
                 <Stack.Item className={stackItem}>
-                    <h3 className={h3Style}>LoebLink</h3>
-                    <LoebLink {...props}></LoebLink>
+                    <h3 className={h3Style}>ShareLink</h3>
+                    <ShareLink {...props}></ShareLink>
                 </Stack.Item>
             </Stack>
         );

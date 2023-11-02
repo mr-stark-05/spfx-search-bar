@@ -3,15 +3,15 @@ import "@pnp/sp/search";
 import { ISearchQuery } from "@pnp/sp/search";
 //import { graphfi } from "@pnp/graph";
 import "@pnp/graph/search";
-import { ILoebLinkItem } from "../model/ILoebLinkItem";
+import { IShareLinkItem } from "../model/IShareLinkItem";
 
-export default class LoebLinkProvider {
+export default class ShareLinkProvider {
 
-    public async GetLoebLinkItems(search: string, context: any): Promise<ILoebLinkItem[]> {
+    public async GetShareLinkItems(search: string, context: any): Promise<IShareLinkItem[]> {
         // Set context for spfi
         const sp = spfi().using(SPFx(context));
 
-        let listItems: ILoebLinkItem[] = [];
+        let listItems: IShareLinkItem[] = [];
         const results = await sp.search(<ISearchQuery>{
             Querytext: search,
             RowLimit: 5
@@ -28,7 +28,7 @@ export default class LoebLinkProvider {
     }
 
     /*
-    private async GetLoebLink(search: string, context: any): Promise<any[]> {
+    private async GetShareLink(search: string, context: any): Promise<any[]> {
 
         // Set context for spfi
         //const sp = spfi().using(SPFx(context));

@@ -89,7 +89,6 @@ export default class SearchBarApplicationCustomizer extends BaseApplicationCusto
       }
       search!.innerHTML = "";
       ReactDom.render(element, search);
-      console.log("React component rendered");
     }
   }
 

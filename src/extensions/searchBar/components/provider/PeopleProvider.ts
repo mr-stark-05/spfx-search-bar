@@ -4,6 +4,11 @@ import { IPersonItem } from "../model/IPersonItem";
 
 export default class PeopleProvider {
     public async GetPeopleItems(search: string, context: any): Promise<IPersonItem[]> {
+    
+        const getPropertyValue = (properties: any[], key: string): string => {
+            const prop = properties.find(p => p.Key === key);
+            return prop ? prop.Value : "";
+        };
 
         // Set context for spfi
         const sp = spfi().using(SPFx(context));
@@ -28,17 +33,18 @@ export default class PeopleProvider {
                 const login = item.Key;
                 if (login && login.startsWith("i:0#.f|membership")) {
                     const profile = await sp.profiles.getPropertiesFor(login);
+                    console.log("profile");
                     console.log(profile);
                     
                     profileResults.push({
                         JobTitle: profile.Title,
                         DisplayName: profile.DisplayName,
-                        FirstName: profile.UserProfileProperties[4].Value,
-                        LastName: profile.UserProfileProperties[6].Value,
-                        Department: profile.UserProfileProperties[11].Value,
-                        Office: profile.UserProfileProperties[61].Value,
-                        WorkPhone: profile.UserProfileProperties[10].Value,
-                        PictureUrl: "string",
+                        FirstName: getPropertyValue(profile.UserProfileProperties, "FirstName"),
+                        LastName: getPropertyValue(profile.UserProfileProperties, "LastName"),
+                        Department: getPropertyValue(profile.UserProfileProperties, "Department"),
+                        Office: getPropertyValue(profile.UserProfileProperties, "Office"),
+                        WorkPhone: getPropertyValue(profile.UserProfileProperties, "WorkPhone"),
+                        PictureUrl: getPropertyValue(profile.UserProfileProperties, "PictureURL"),
                         ProfileUrl: profile.UserUrl
                     });
                 }

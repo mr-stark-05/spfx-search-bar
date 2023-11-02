@@ -1,19 +1,19 @@
 import * as React from "react";
 import { Link } from "@fluentui/react";
 import { List } from "@fluentui/react/lib/List";
-import { ILoebLinkItem } from "./model/ILoebLinkItem";
+import { IShareLinkItem } from "./model/IShareLinkItem";
 import { getClassNames } from "./SearchResults.theme";
 
-export interface ILoebLinkProps {
-    loeb: ILoebLinkItem[];
+export interface IShareLinkProps {
+    share: IShareLinkItem[];
     link: string;
 }
 
-export default function LoebLink(props: ILoebLinkProps) {
+export default function ShareLink(props: IShareLinkProps) {
 
     const {itemCell, itemContent, itemLink, itemName, itemAuthor, moreLink} = getClassNames();
 
-    const onRenderCell = (item: ILoebLinkItem, index: number, isScrolling: boolean): JSX.Element => {
+    const onRenderCell = (item: IShareLinkItem, index: number, isScrolling: boolean): JSX.Element => {
         if(item.Title!.length > 50) {
             item.Title = item.Title!.slice(0,50) + "...";
         }
@@ -34,7 +34,7 @@ export default function LoebLink(props: ILoebLinkProps) {
 
     return(
         <div>
-            <List items={props.loeb} onRenderCell={onRenderCell}>
+            <List items={props.share} onRenderCell={onRenderCell}>
             </List>
             <Link href={props.link} className={moreLink}>More...</Link>
         </div>

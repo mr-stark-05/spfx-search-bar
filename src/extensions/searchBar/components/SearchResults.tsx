@@ -22,8 +22,8 @@ import { getClassNames } from "./SearchResults.theme";
 import People from "./People";
 import { IExperienceItem } from "./model/IExperienceItem";
 import ExperienceProvider from "./provider/ExperienceProvider";
-import LoebLinkProvider from "./provider/LoebLinkProvider";
-import ExperienceLoeblink from "./ExperienceLoebLink";
+import ShareLinkProvider from "./provider/ShareLinkProvider";
+import ExperienceShareLink from "./ExperienceShareLink";
 import { useMediaQuery } from "react-responsive";
 import { ExtensionContext } from "@microsoft/sp-extension-base";
 
@@ -60,24 +60,24 @@ export default function SearchResults(props: ISearchResultsProps) {
   //const [fullPeople, setFullPeople] = React.useState<IPersonItem[]>([]);
   const [exp, setExp] = React.useState<IExperienceItem[]>([]);
   //const [fullExp, setFullExp] = React.useState<IExperienceItem[]>([]);
-  const [loeb, setLoeb] = React.useState<any[]>([]);
+  const [share, setShare] = React.useState<any[]>([]);
   //const [fullLoeb, setFullLoeb] = React.useState<any[]>([]);
   const [searchText, setSearchText] = React.useState<string>("");
 
   //Id used as target for Callout
   const searchBoxId = useId("search-bar");
-  console.log("item cell remove left margin");
+  console.log("get prop by key");
 
   const [isCalloutVisible, { toggle: toggleIsCalloutVisible }] =
     useBoolean(false);
   const [peopleDataLoaded, { toggle: togglePeopleLoaded }] = useBoolean(false);
-  const [expLoebDataLoaded, { toggle: toggleExpLoebDataLoaded }] = useBoolean(false);
+  const [expShareDataLoaded, { toggle: toggleExpShareDataLoaded }] = useBoolean(false);
 
   //Get each list and set the arrays
   const getListData = async (): Promise<void> => {
     const peopleProvider = new PeopleProvider();
     const experienceProvider = new ExperienceProvider();
-    const loebLinkProvider = new LoebLinkProvider();
+    const shareLinkProvider = new ShareLinkProvider();
 
     const allPeople: IPersonItem[] = await peopleProvider.GetPeopleItems(
       searchText,
@@ -93,7 +93,7 @@ export default function SearchResults(props: ISearchResultsProps) {
       setExp(exp);
     }
 
-    const allLoeb: any[] = await loebLinkProvider.GetLoebLinkItems(searchText, props.context);
+    const allShare: any[] = await shareLinkProvider.GetShareLinkItems(searchText, props.context);
 
     if (allPeople.length > 0) {
       setPeople(allPeople);
@@ -103,8 +103,8 @@ export default function SearchResults(props: ISearchResultsProps) {
       setExp(allExp);
       //setFullExp(allExp);
     }
-    if (allLoeb.length > 0) {
-      setLoeb(allLoeb);
+    if (allShare.length > 0) {
+      setShare(allShare);
       //setFullLoeb(allLoeb);
     }
   };
@@ -114,8 +114,8 @@ export default function SearchResults(props: ISearchResultsProps) {
       togglePeopleLoaded();
     }
 
-    if ((exp.length > 0 && !expLoebDataLoaded) || (loeb.length > 0 && !expLoebDataLoaded)) {
-      toggleExpLoebDataLoaded();
+    if ((exp.length > 0 && !expShareDataLoaded) || (share.length > 0 && !expShareDataLoaded)) {
+      toggleExpShareDataLoaded();
     }
   }, [people, exp]);
 
@@ -168,8 +168,8 @@ export default function SearchResults(props: ISearchResultsProps) {
     onDispose: props.onDispose,
   };
 
-  const experienceLoebLinkProps = {
-    loeb: loeb,
+  const experienceShareLinkProps = {
+    share: share,
     exp: exp,
     link:
       "https://pparkerdev.sharepoint.com/_layouts/15/search.aspx/?q=" +
@@ -207,9 +207,9 @@ export default function SearchResults(props: ISearchResultsProps) {
               <Shimmer isDataLoaded={peopleDataLoaded} className={shimmerStyle}>
                 <People {...peopleProps}></People>
               </Shimmer>
-			        {expLoebDataLoaded && (
-                <Shimmer isDataLoaded={expLoebDataLoaded} className={shimmerStyle}>
-                  <ExperienceLoeblink {...experienceLoebLinkProps}></ExperienceLoeblink>
+			        {expShareDataLoaded && (
+                <Shimmer isDataLoaded={expShareDataLoaded} className={shimmerStyle}>
+                  <ExperienceShareLink {...experienceShareLinkProps}></ExperienceShareLink>
                 </Shimmer>
 			      )}
             </Callout>

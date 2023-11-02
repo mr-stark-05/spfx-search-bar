@@ -19,7 +19,6 @@ export interface IComponentClassNames {
     stackItem: string;
     smallPersona: string;
     moreLink: string;
-    peopleMoreLink: string;
     itemCell: string;
     itemContent: string;
     itemName: string;
@@ -69,7 +68,9 @@ export const getClassNames = (): IComponentClassNames => {
             "padding-bottom": "10px",
             width: "inherit"
         },
-        calloutStyles: { width: "100%" },
+        calloutStyles: { 
+            width: "100%"
+        },
         teachingBubble: { color: "white"},
         suggestionHeader:{ "padding-left": "5%"},
         personaText: { 
@@ -89,12 +90,6 @@ export const getClassNames = (): IComponentClassNames => {
         },
         moreLink: {
             "padding-top": "40px",
-            marginLeft: "10px",
-            position: "absolute",
-            bottom: "0"
-        },
-        peopleMoreLink : {
-            "padding-top": "100px",
             marginLeft: "10px",
             position: "absolute",
             bottom: "0"
